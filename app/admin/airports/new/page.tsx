@@ -1,5 +1,5 @@
 import React from 'react';
-import prisma from "@/lib/db";
+import prisma from "@/lib/prisma";
 import {Typography} from "@mui/material";
 import AirportForm from "@/components/Admin/Airport/AirportForm";
 

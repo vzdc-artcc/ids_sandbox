@@ -1,5 +1,5 @@
 import React from 'react';
-import prisma from "@/lib/db";
+import prisma from "@/lib/prisma";
 import {notFound} from "next/navigation";
 import {Card, CardContent, Typography} from "@mui/material";
 import RadarSectorForm from "@/components/Admin/RadarSector/RadarSectorForm";

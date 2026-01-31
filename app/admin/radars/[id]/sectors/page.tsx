@@ -1,5 +1,5 @@
 import React, {Suspense} from 'react';
-import prisma from "@/lib/db";
+import prisma from "@/lib/prisma";
 import {Button, Card, CardContent, CircularProgress, Stack, Typography} from "@mui/material";
 import {notFound} from "next/navigation";
 import RadarSectorTable from "@/components/Admin/RadarSector/RadarSectorTable";

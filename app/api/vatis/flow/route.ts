@@ -1,7 +1,7 @@
 import {NextRequest, NextResponse} from "next/server";
-import prisma from "@/lib/db";
+import prisma from "@/lib/prisma";
 import {AtisUpdate} from "@/types";
-import {Prisma} from "@prisma/client";
+import {Prisma} from "@/generated/prisma/client";
 import {revalidatePath} from "next/cache";
 import AirportRunwayUpdateInput = Prisma.AirportRunwayUpdateInput;
 

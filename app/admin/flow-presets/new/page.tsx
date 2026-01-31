@@ -1,6 +1,6 @@
 import React from 'react';
 import {Button, ButtonGroup, Typography} from "@mui/material";
-import prisma from "@/lib/db";
+import prisma from "@/lib/prisma";
 import Link from "next/link";
 
 export default async function Page() {

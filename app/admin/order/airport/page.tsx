@@ -2,7 +2,7 @@ import React from 'react';
 import {Card, CardContent, Typography} from "@mui/material";
 import OrderList from "@/components/Admin/Order/OrderList";
 import {updateAirportOrder} from "@/actions/airport";
-import prisma from "@/lib/db";
+import prisma from "@/lib/prisma";
 
 export default async function Page() {
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import {Card, CardContent, Typography} from "@mui/material";
 import OrderList from "@/components/Admin/Order/OrderList";
-import prisma from "@/lib/db";
+import prisma from "@/lib/prisma";
 import {updateRadarOrder} from "@/actions/radar";
 
 export default async function Page() {

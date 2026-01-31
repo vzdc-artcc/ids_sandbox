@@ -1,6 +1,6 @@
 import React from 'react';
 import {notFound} from "next/navigation";
-import prisma from "@/lib/db";
+import prisma from "@/lib/prisma";
 import {Card, CardContent, Typography} from "@mui/material";
 import RadarSectorForm from "@/components/Admin/RadarSector/RadarSectorForm";
 

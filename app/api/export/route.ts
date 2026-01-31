@@ -1,4 +1,4 @@
-import prisma from "@/lib/db";
+import prisma from "@/lib/prisma";
 import {log} from "@/actions/log";
 import JSZip from "jszip";
 
@@ -108,7 +108,7 @@ export async function GET() {
         "\n\nIDS developed by Aneesh Reddy & vZDC Web Team" +
         `\n\nGENERATED ${(new Date()).toUTCString()}`);
 
-    const zipFolder = await zip.generateAsync({type: "uint8array"});
+    const zipFolder = await zip.generateAsync({type: "blob"});
 
     return new Response(zipFolder, {
         headers: {

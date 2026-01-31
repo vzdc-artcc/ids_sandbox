@@ -1,9 +1,8 @@
 'use server';
 
 import {GridFilterItem, GridPaginationModel, GridSortModel} from "@mui/x-data-grid";
-import {LogModel, LogType} from "@/generated/prisma/enums";
+import {LogModel, LogType, Prisma} from "@/generated/prisma/client";
 import prisma from "@/lib/prisma";
-import {Prisma} from "@/generated/prisma/client";
 import {auth} from "@/lib/auth";
 import {headers} from "next/headers";
 
