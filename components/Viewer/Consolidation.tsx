@@ -1,6 +1,6 @@
 'use client';
-import React, {useEffect, useState} from 'react';
-import {DefaultRadarConsolidation, Radar, RadarConsolidation, RadarSector, User} from "@/generated/prisma/client";
+import React, {useEffect, useMemo, useState} from 'react';
+import {User} from "@/generated/prisma/client";
 import {
     createConsolidation,
     deleteConsolidation,
@@ -27,36 +27,40 @@ import {Delete, Edit} from "@mui/icons-material";
 import {fetchAllDefaultRadarConsolidations} from "@/actions/defaultRadarConsolidation";
 import {fetchAllUsers} from '@/actions/user';
 import {createAuthClient} from "better-auth/react";
+import type {Consolidation, RadarSectorWithRadar, DefaultRadarConsolidationWithSectors} from "@/types/consolidation";
 
-export type Consolidation = RadarConsolidation & {
-    primarySector: RadarSectorWithRadar;
-    secondarySectors: RadarSectorWithRadar[];
-    user: User;
-}
-
-type RadarSectorWithRadar = RadarSector & {
-    radar: Radar;
-}
-
-type DefaultRadarConsolidationWithSectors = DefaultRadarConsolidation & {
-    primarySector: RadarSectorWithRadar;
-    secondarySectors: RadarSectorWithRadar[];
-}
+const authClient = createAuthClient();
 
 export default function Consolidation({ onlyMe, onCreateSuccess }: {onlyMe?: boolean, onCreateSuccess?: () => void}) {
 
-    const authClient = createAuthClient();
     const session = authClient.useSession();
     const [allUsers, setAllUsers] = useState<{id: string, firstName: string | null, lastName: string | null, fullName: string | null, cid: string}[]>();
-    const [selectedUser, setSelectedUser] = useState<{id: string, firstName: string | null, lastName: string | null, fullName: string | null, cid: string} | null>();
+    const [selectedUser, setSelectedUser] = useState<{id: string, firstName: string | null, lastName: string | null, fullName: string | null, cid: string} | null>(null);
     const [allRadarConsolidations, setAllRadarConsolidations] = useState<Consolidation[]>();
-    const [yourConsolidation, setYourConsolidation] = useState<Consolidation | null>();
     const [allRadarSectors, setAllRadarSectors] = useState<RadarSectorWithRadar[]>();
     const [allDefaultConsolidations, setAllDefaultConsolidations] = useState<DefaultRadarConsolidationWithSectors[]>();
-    const [primarySector, setPrimarySector] = useState<RadarSectorWithRadar | null>(yourConsolidation?.primarySector || null);
+    const [primarySector, setPrimarySector] = useState<RadarSectorWithRadar | null>(null);
     const [secondarySectors, setSecondarySectors] = useState<RadarSectorWithRadar[]>([]);
     const [editMode, setEditMode] = useState<string | null>(null);
     const [consolidateAllSectors, setConsolidateAllSectors] = useState<boolean>(false);
+
+    // Derive the effective user - prefer selectedUser, fall back to session user
+    const effectiveUser = selectedUser ?? (session.data?.user as User | null);
+
+    // Derive yourConsolidation from allRadarConsolidations and effectiveUser
+    const yourConsolidation = useMemo(() => {
+        if (!allRadarConsolidations || !effectiveUser) return null;
+        return allRadarConsolidations.find((consolidation) => consolidation.user.id === effectiveUser.id) || null;
+    }, [allRadarConsolidations, effectiveUser]);
+
+    // Initialize selectedUser from session once when session becomes available and selectedUser hasn't been set
+    const sessionUserId = session.data?.user?.id;
+    useEffect(() => {
+        if (sessionUserId && !selectedUser && session.data?.user) {
+            setSelectedUser(session.data.user as User);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [sessionUserId]);
 
     useEffect(() => {
         let isMounted = true;
@@ -73,14 +77,9 @@ export default function Consolidation({ onlyMe, onCreateSuccess }: {onlyMe?: boo
                 if (!isMounted) return;
 
                 setAllRadarConsolidations(all);
-                setYourConsolidation(all.find((consolidation) => consolidation.user.id === (selectedUser?.id || session.data?.user?.id)) || null);
                 setAllRadarSectors(sectors);
                 setAllDefaultConsolidations(defaults);
                 setAllUsers(users);
-
-                if (!selectedUser && session.data?.user) {
-                    setSelectedUser(session.data.user as User);
-                }
             } catch (error) {
                 if (isMounted) {
                     console.error('Error loading consolidation data:', error);
@@ -88,12 +87,13 @@ export default function Consolidation({ onlyMe, onCreateSuccess }: {onlyMe?: boo
             }
         };
 
-        loadData();
+        loadData().then();
 
         return () => {
             isMounted = false;
         };
-    }, [session, selectedUser]);
+    }, []);
+
 
     const handleEditToggle = (id: string | null, consolidation?: Consolidation) => {
         if (consolidation) {

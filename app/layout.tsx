@@ -8,6 +8,10 @@ import {ToastContainer} from "react-toastify";
 import {Container, Typography} from "@mui/material";
 import Script from "next/script";
 import {Metadata} from "next";
+import prisma from "@/lib/prisma";
+import {auth} from "@/lib/auth";
+import {headers} from "next/headers";
+import {Consolidation} from "@/types";
 
 const roboto = Roboto({
   weight: ['300', '400', '500', '700'],
@@ -21,17 +25,37 @@ export const metadata: Metadata = {
     description: 'vZDC IDS',
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
+    const session = await auth.api.getSession({
+        headers: await headers(),
+    });
+
+    const myRadarConsolidation = await prisma.radarConsolidation.findFirst({
+        where: {
+            userId: session?.user.id || '',
+        },
+        include: {
+            primarySector: {
+                include: {
+                    radar: true,
+                },
+            },
+            secondarySectors: true,
+            user: true,
+        }
+    });
+
   return (
     <html lang="en" className={roboto.variable}>
       <body>
           <AppRouterCacheProvider>
               <ThemeProvider theme={theme}>
-                  <Navbar />
+                  <Navbar activeConsol={myRadarConsolidation as Consolidation} />
                   <Container maxWidth="xl" sx={{display: {xs: 'inherit', lg: 'none'},}}>
                       <Typography variant="h6" textAlign="center">The I.D.S. is not made for smaller screen sizes. Please
                           increase your screen size or zoom out to access the IDS.</Typography>
