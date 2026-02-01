@@ -1,6 +1,6 @@
 'use client';
 import React, {useEffect, useState} from 'react';
-import {DefaultRadarConsolidation, Radar, RadarConsolidation, RadarSector, User} from "@prisma/client";
+import {DefaultRadarConsolidation, Radar, RadarConsolidation, RadarSector, User} from "@/generated/prisma/client";
 import {
     createConsolidation,
     deleteConsolidation,
@@ -25,8 +25,8 @@ import {toast} from "react-toastify";
 import {socket} from "@/lib/socket";
 import {Delete, Edit} from "@mui/icons-material";
 import {fetchAllDefaultRadarConsolidations} from "@/actions/defaultRadarConsolidation";
-import {useSession} from 'next-auth/react';
 import {fetchAllUsers} from '@/actions/user';
+import {createAuthClient} from "better-auth/react";
 
 export type Consolidation = RadarConsolidation & {
     primarySector: RadarSectorWithRadar;
@@ -45,7 +45,8 @@ type DefaultRadarConsolidationWithSectors = DefaultRadarConsolidation & {
 
 export default function Consolidation({ onlyMe, onCreateSuccess }: {onlyMe?: boolean, onCreateSuccess?: () => void}) {
 
-    const session = useSession();
+    const authClient = createAuthClient();
+    const session = authClient.useSession();
     const [allUsers, setAllUsers] = useState<{id: string, firstName: string | null, lastName: string | null, fullName: string | null, cid: string}[]>();
     const [selectedUser, setSelectedUser] = useState<{id: string, firstName: string | null, lastName: string | null, fullName: string | null, cid: string} | null>();
     const [allRadarConsolidations, setAllRadarConsolidations] = useState<Consolidation[]>();

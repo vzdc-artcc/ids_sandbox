@@ -1,6 +1,6 @@
 'use client';
 import React, {useEffect, useState} from 'react';
-import {Radar} from "@prisma/client";
+import {Radar} from "@/generated/prisma/client";
 import {Autocomplete, Button, Card, CardContent, CircularProgress, Stack, TextField, Typography} from "@mui/material";
 import {toast} from "react-toastify";
 import {socket} from "@/lib/socket";
@@ -10,14 +10,16 @@ export default function RadarSettings() {
 
     const [allRadars, setAllRadars] = useState<Radar[]>();
     const [selectedRadar, setSelectedRadar] = useState<Radar | null>(null);
-    const [notams, setNotams] = useState<string[]>(selectedRadar?.notams || []);
+    const [notams, setNotams] = useState<string[]>([]);
 
     useEffect(() => {
         if (!allRadars) fetchAllRadars().then(setAllRadars);
-        if (selectedRadar) {
-            setNotams(selectedRadar.notams);
-        }
-    }, [allRadars, selectedRadar]);
+    }, [allRadars]);
+
+    const handleRadarChange = (newValue: Radar | null) => {
+        setSelectedRadar(newValue);
+        setNotams(newValue?.notams || []);
+    };
 
     const saveNotams = async () => {
         const radar = await updateNotams(selectedRadar?.id || '', notams.filter(n => n.trim() !== ''));
@@ -42,7 +44,7 @@ export default function RadarSettings() {
                         options={allRadars}
                         getOptionLabel={(option) => option.facilityId}
                         value={selectedRadar}
-                        onChange={(event, newValue) => setSelectedRadar(newValue)}
+                        onChange={(event, newValue) => handleRadarChange(newValue)}
                         renderInput={(params) => <TextField {...params} label="Select Radar" variant="outlined"/>}
                     />
                     <Button variant="contained" size="small" sx={{mt: 2}} onClick={() => {

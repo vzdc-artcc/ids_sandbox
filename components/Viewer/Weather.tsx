@@ -3,7 +3,7 @@ import React, {useEffect, useState} from 'react';
 import {Stack, Typography} from "@mui/material";
 
 export default function Weather() {
-    const [cacheBuster, setCacheBuster] = useState(Date.now());
+    const [cacheBuster, setCacheBuster] = useState(() => Date.now());
 
     useEffect(() => {
         const interval = setInterval(() => {

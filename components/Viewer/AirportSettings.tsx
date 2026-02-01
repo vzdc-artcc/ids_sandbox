@@ -1,6 +1,6 @@
 'use client';
 import React, {SyntheticEvent, useEffect, useState} from 'react';
-import {Airport, AirportRunway, FlowPreset, FlowPresetRunway} from "@prisma/client";
+import {Airport, AirportRunway, FlowPreset, FlowPresetRunway} from "@/generated/prisma/client";
 import {fetchAllAirports, updateFlow, updateLocalSplit, updateNotams, updateVatisFlag} from "@/actions/airport";
 import {
     Autocomplete,
@@ -11,7 +11,7 @@ import {
     Checkbox,
     CircularProgress,
     FormControlLabel,
-    Grid2,
+    Grid,
     Stack,
     TextField,
     Typography
@@ -53,9 +53,19 @@ export default function AirportSettings() {
 
     useEffect(() => {
         if (!allAirports) fetchAllAirports().then(setAllAirports);
+    }, [allAirports]);
+
+    useEffect(() => {
         if (selectedAirport) {
             fetchFlowPresetsForAirport(selectedAirport.id).then(setFlowPresets);
-            setRunwaySettings(selectedAirport.runways
+        }
+    }, [selectedAirport]);
+
+    const handleAirportChange = (newValue: AirportWithRunways | null) => {
+        setSelectedAirport(newValue);
+        setSelectedFlowPreset(null);
+        if (newValue) {
+            setRunwaySettings(newValue.runways
                 .reduce((acc, runway) => ({
                     ...acc,
                     [runway.id]: {
@@ -63,10 +73,14 @@ export default function AirportSettings() {
                         inUseApproachTypes: runway.inUseApproachTypes,
                     },
                 }), {}));
-            setLocalSplit(selectedAirport.localSplit);
-            setNotams(selectedAirport.notams);
+            setLocalSplit(newValue.localSplit);
+            setNotams(newValue.notams);
+        } else {
+            setRunwaySettings({});
+            setLocalSplit([]);
+            setNotams([]);
         }
-    }, [allAirports, selectedAirport]);
+    };
 
     const handleRunwayChange = (runwayId: string, type: 'inUseDepartureTypes' | 'inUseApproachTypes', values: string[]) => {
         setRunwaySettings((prev) => ({
@@ -146,7 +160,7 @@ export default function AirportSettings() {
                         options={allAirports}
                         getOptionLabel={(option) => option.icao}
                         value={selectedAirport}
-                        onChange={(event, newValue) => setSelectedAirport(newValue)}
+                        onChange={(event, newValue) => handleAirportChange(newValue)}
                         renderInput={(params) => <TextField {...params} label="Select Airport" variant="outlined"/>}
                     />
                     <Button variant="contained" size="small" sx={{mt: 2,}} onClick={() => {
@@ -162,12 +176,12 @@ export default function AirportSettings() {
                         <CardContent>
                             <Typography variant="h6" gutterBottom>{selectedAirport.icao} Settings</Typography>
                             <Stack direction="column" spacing={2}>
-                                <Grid2 size={{xs: 2}}>
+                                <Grid size={{xs: 2}}>
                                     <FormControlLabel
                                         control={<Checkbox defaultChecked={selectedAirport.disableAutoAtis}
                                                            name="disableAutoAtis"/>}
                                         label="Disable vATIS Sync?" onChange={handleVatisChange}/>
-                                </Grid2>
+                                </Grid>
                                 <Autocomplete
                                     options={flowPresets || []}
                                     value={selectedFlowPreset}

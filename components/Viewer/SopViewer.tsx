@@ -1,7 +1,7 @@
 'use client';
 import React, {useEffect, useState} from 'react';
 import {fetchAllFacilities, getSopLink} from "@/actions/facility";
-import {Facility} from "@prisma/client";
+import {Facility} from "@/generated/prisma/client";
 import {Autocomplete, Card, CardContent, Divider, TextField} from "@mui/material";
 import UrlViewer from "@/components/Viewer/UrlViewer";
 

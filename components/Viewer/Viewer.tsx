@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import {Grid2, Typography} from "@mui/material";
+import {Grid, Typography} from "@mui/material";
 import {useSearchParams} from "next/navigation";
 import UrlViewer from "@/components/Viewer/UrlViewer";
 import EmergencyChecklist from "@/components/Viewer/EmergencyChecklist";
@@ -12,7 +12,6 @@ import Airspace from "@/components/Viewer/Airspace";
 import AirportSettings from "@/components/Viewer/AirportSettings";
 import RadarSettings from "@/components/Viewer/RadarSettings";
 import Consolidation from "@/components/Viewer/Consolidation";
-import { SessionProvider } from 'next-auth/react';
 import ReleaseWindow from "@/components/Viewer/ReleaseWindow";
 
 export default function Viewer() {
@@ -27,22 +26,20 @@ export default function Viewer() {
 
 
     return (
-        <Grid2 size={12} sx={{border: 1, borderBottom: 0, minHeight: 950,}}>
-            <SessionProvider>
-                <Typography variant="h6">VIEWER</Typography>
-                <div style={{paddingTop: 64, height: '1px',}} id="viewer"></div>
-                {display === 'url' && <UrlViewer url={searchParams.get('url') || ''}/>}
-                {display === 'emergency' && <EmergencyChecklist/>}
-                {display === 'position' && <PositionChecklist/>}
-                {display === 'wx' && <Weather/>}
-                {display === 'sop' && <SopViewer defaultFacility={facility || undefined}/>}
-                {display === 'prd' && <PreferredRoutes startAirport={prdStartAirport || undefined}/>}
-                {display === 'airspace' && <Airspace/>}
-                {display === 'set-airport' && <AirportSettings/>}
-                {display === 'set-radar' && <RadarSettings/>}
-                {display === 'consol' && <Consolidation/>}
-                {display === 'rel' && <ReleaseWindow facilityId={facility || ''} />}
-            </SessionProvider>
-        </Grid2>
+        <Grid size={12} sx={{border: 1, borderBottom: 0, minHeight: 950,}}>
+            <Typography variant="h6">VIEWER</Typography>
+            <div style={{paddingTop: 64, height: '1px',}} id="viewer"></div>
+            {display === 'url' && <UrlViewer url={searchParams.get('url') || ''}/>}
+            {display === 'emergency' && <EmergencyChecklist/>}
+            {display === 'position' && <PositionChecklist/>}
+            {display === 'wx' && <Weather/>}
+            {display === 'sop' && <SopViewer defaultFacility={facility || undefined}/>}
+            {display === 'prd' && <PreferredRoutes startAirport={prdStartAirport || undefined}/>}
+            {display === 'airspace' && <Airspace/>}
+            {display === 'set-airport' && <AirportSettings/>}
+            {display === 'set-radar' && <RadarSettings/>}
+            {display === 'consol' && <Consolidation/>}
+            {display === 'rel' && <ReleaseWindow facilityId={facility || ''} />}
+        </Grid>
     );
 }
