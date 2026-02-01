@@ -60,7 +60,6 @@ export const auth = betterAuth({
                             },
                         });
                         const { data } = await response.json();
-                        console.log(data);
 
                         return {
                             id: data.cid.toString(),
