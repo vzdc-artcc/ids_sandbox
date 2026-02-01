@@ -1,6 +1,6 @@
 'use client';
 import React, {useEffect} from 'react';
-import {Box, Button, ButtonGroup, CircularProgress} from "@mui/material";
+import {Box, Button, ButtonGroup, CircularProgress, Typography} from "@mui/material";
 import {fetchCharts} from "@/actions/charts";
 import {usePathname, useRouter} from "next/navigation";
 import {toast} from "react-toastify";
@@ -49,7 +49,8 @@ export default function AirportCharts({icao}: { icao: string, }) {
     };
 
     return (
-        <Box sx={{overflowY: 'auto'}}>
+        <Box>
+            <Typography variant="h6">CHARTS</Typography>
             {!charts && <CircularProgress/>}
             {Object.entries(charts || {}).map(([code, charts]) => (
                 <ButtonGroup

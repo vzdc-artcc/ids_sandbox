@@ -23,17 +23,8 @@ export async function generateMetadata(
 ): Promise<Metadata> {
     const {id} = await params;
 
-    const airport = await prisma.airport.findUnique({
-        where: {
-            facilityId: id,
-        },
-        select: {
-            facilityId: true,
-        },
-    });
-
     return {
-        title: airport?.facilityId || 'UNKNOWN',
+        title: `${id} -- IDS`,
     }
 }
 
@@ -63,22 +54,21 @@ export default async function Page({params}: { params: Promise<{ id: string }> }
 
     return session?.user && (
         <Grid container columns={12}>
-            <MessageListener facility={id} cid={session.user.cid} />
-            {/*<AirportAtisGridItems icao={airport.icao} atisIntegrationDisabled={airport.disableAutoAtis}*/}
-            {/*                      disableOnlineInformation={TRAINING_MODE}/>*/}
-            {/*<AirportFlowGridItem airport={airport} runways={airport.runways}/>*/}
-            {/*<AirportLocalInformation airport={airport} disableOnlineInformation={TRAINING_MODE}/>*/}
+            <AirportAtisGridItems icao={airport.icao} atisIntegrationDisabled={airport.disableAutoAtis}
+                                  disableOnlineInformation={TRAINING_MODE}/>
+            <AirportFlowGridItem airport={airport} runways={airport.runways}/>
+            <AirportLocalInformation airport={airport} disableOnlineInformation={TRAINING_MODE}/>
             <ReleaseRequestInformation facility={id} cid={session.user.cid} />
             {/*<NotamInformation facility={airport.facility} initialNotams={airport.notams}/>*/}
             <TmuGridItem facility={airport.facility}/>
             <AirportRadarInformation icao={airport.icao} radars={airport.radars}
                                      disableOnlineInformation={TRAINING_MODE}/>
-            <Grid size={6} sx={{border: 1, maxHeight: 300, overflow: 'auto',}}>
-                <Typography variant="h6">CHARTS</Typography>
+            <Grid size={6} sx={{border: 1, height: 250, overflow: 'auto',}}>
                 <AirportCharts icao={airport.icao}/>
             </Grid>
             <ButtonsTray airport={airport}/>
             <Viewer/>
+            <MessageListener facility={id} cid={session.user.cid} />
         </Grid>
     );
 }

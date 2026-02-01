@@ -1,6 +1,6 @@
 'use client';
 import React, {useEffect, useState} from 'react';
-import {Box, CircularProgress, Divider, Grid2, Stack, TextField, Tooltip, Typography} from "@mui/material";
+import {Box, CircularProgress, Divider, Grid, Stack, TextField, Tooltip, Typography} from "@mui/material";
 import {AtisUpdate} from "@/types";
 import {fetchMetar} from "@/actions/atis";
 import {socket} from "@/lib/socket";
@@ -38,11 +38,17 @@ export default function AirportAtisGridItems({icao, small, free, atisIntegration
             }
         };
 
-        const handleVatsimData = (data: any) => {
+        const handleVatsimData = (data: { atis: {
+            atis_code: string,
+            callsign: string,
+            frequency: string,
+            text_atis: string[],
+            }[] }) => {
+            console.log('VATSIM data received for ATIS:', data);
+            fetchMetar(airportIcao).then(setMetar).catch((error) => {
+                console.error('Error fetching METAR:', error);
+            });
             if (!disableOnlineInformation) {
-                fetchMetar(airportIcao).then(setMetar).catch((error) => {
-                    console.error('Error fetching METAR:', error);
-                });
                 const atis = (data.atis as {
                     atis_code: string,
                     callsign: string,
@@ -134,7 +140,7 @@ export default function AirportAtisGridItems({icao, small, free, atisIntegration
     if (small) {
         return (
             <>
-                <Grid2 size={1} sx={{border: 1,}}>
+                <Grid size={1} sx={{border: 1,}}>
                     {free &&
                         <TextField variant="outlined" label="ICAO" size="small" value={airportIcao}
                                    onChange={handleAirportIcaoChange} sx={{width: '100%',}}/>
@@ -146,8 +152,8 @@ export default function AirportAtisGridItems({icao, small, free, atisIntegration
                             <Typography variant="h6" color="orange"
                                         textAlign="center">{airportIcao.toUpperCase()}</Typography>
                         </Tooltip>}
-                </Grid2>
-                <Grid2 size={1} sx={{border: 1,}}>
+                </Grid>
+                <Grid size={1} sx={{border: 1,}}>
                     {!free && !metar && !disableOnlineInformation &&
                         <Stack direction="column" justifyContent="center" alignItems="center">
                             <CircularProgress size={25}/>
@@ -170,24 +176,24 @@ export default function AirportAtisGridItems({icao, small, free, atisIntegration
                         <Typography variant="h6" textAlign="center" color={getMetarColor(metar || '')}
                                     fontWeight="bold">UNK</Typography>
                     </Tooltip>}
-                </Grid2>
-                <Grid2 size={2} sx={{border: 1,}}>
+                </Grid>
+                <Grid size={2} sx={{border: 1,}}>
                     <Typography textAlign="center" variant="h6">{wind}</Typography>
-                </Grid2>
-                <Grid2 size={1} sx={{border: 1,}}>
+                </Grid>
+                <Grid size={1} sx={{border: 1,}}>
                     <Typography textAlign="center" variant="h6"
                                 sx={{
                                     textDecoration: 'underline',
                                     textDecorationColor: 'orange',
                                 }}>{altimeter}</Typography>
-                </Grid2>
+                </Grid>
             </>
         )
     }
 
     return (
         <>
-            <Grid2 size={2} sx={{border: 1,}}>
+            <Grid size={2} sx={{border: 1,height: 200,}}>
                 <Typography variant="h3" textAlign="center">{airportIcao.toUpperCase()}</Typography>
                 {atisDisabled &&
                     <Typography textAlign="center" color="orange" fontWeight="bold">AUTO FLOW DISABLED</Typography>}
@@ -198,8 +204,8 @@ export default function AirportAtisGridItems({icao, small, free, atisIntegration
                             seconds</Typography>
                     </Stack>
                 }
-            </Grid2>
-            <Grid2 size={1} sx={{border: 6, borderColor: getMetarColor(metar || ''),}}>
+            </Grid>
+            <Grid size={1} sx={{border: 6, borderColor: getMetarColor(metar || ''),height: 200,}}>
                 {!combinedAtis && !departureAtis && !arrivalAtis &&
                     <Typography variant="h1" textAlign="center" color={getMetarColor(metar || '')}
                                 fontWeight="bold">-</Typography>}
@@ -212,8 +218,8 @@ export default function AirportAtisGridItems({icao, small, free, atisIntegration
                 <Typography variant="h6" textAlign="center">{wind}</Typography>
                 <Typography variant="h6" textAlign="center"
                             sx={{textDecoration: 'underline', textDecorationColor: 'orange',}}>{altimeter}</Typography>
-            </Grid2>
-            <Grid2 size={6} sx={{border: 1,}}>
+            </Grid>
+            <Grid size={6} sx={{border: 1,height: 200,overflowY: 'auto',}}>
                 <Typography variant="h6" color={getMetarColor(metar || '')}>{metar}</Typography>
                 <Divider/>
                 {!combinedAtis && !departureAtis && !arrivalAtis &&
@@ -225,7 +231,7 @@ export default function AirportAtisGridItems({icao, small, free, atisIntegration
                 {!combinedAtis && arrivalAtis &&
                     <Typography variant="subtitle2"
                                 color="red">{arrivalAtis.airportConditions} NOTAMS {arrivalAtis.notams}</Typography>}
-            </Grid2>
+            </Grid>
         </>
     );
 

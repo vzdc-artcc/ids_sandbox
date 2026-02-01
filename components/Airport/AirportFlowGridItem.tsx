@@ -1,7 +1,7 @@
 'use client';
 import React, {useEffect, useState} from 'react';
-import {Airport, AirportRunway} from "@prisma/client";
-import {Divider, Grid2, Stack, Typography} from "@mui/material";
+import {Airport, AirportRunway} from "@/generated/prisma/client";
+import {Divider, Grid, Stack, Typography} from "@mui/material";
 import {socket} from "@/lib/socket";
 import {toast} from "react-toastify";
 
@@ -36,20 +36,20 @@ export default function AirportFlowGridItem({airport, runways, small}: {
     if (small) {
         return (
             <>
-                <Grid2 size={3} sx={{border: 1,}}>
+                <Grid size={3} sx={{border: 1,}}>
                     <Typography variant="h6" textAlign="center">
                         <span
                             style={{color: 'yellow',}}>{arrivalRunways.map((r) => r.runwayIdentifier).join(' ')}</span><span> / </span><span
                         style={{color: 'purple',}}>{departureRunways.map((r) => r.runwayIdentifier).join(' ')}</span>
                     </Typography>
-                </Grid2>
+                </Grid>
             </>
         )
     }
 
     return (
-        <Grid2 size={3} sx={{border: 1,}}>
-            <Stack direction="column" spacing={1} sx={{color: 'yellow', height: 200, overflow: 'auto',}}>
+        <Grid size={3} sx={{border: 1,height: 200,}}>
+            <Stack direction="column" spacing={1} sx={{color: 'yellow', height: '100%', overflow: 'auto',}}>
                 {arrivalRunways.map(runway => (
                     <Typography key={runway.id} variant={arrivalRunways.length > 2 ? 'h6' : 'h4'}>
                         {runway.inUseApproachTypes.join('/')} <b>{runway.runwayIdentifier}</b>
@@ -62,6 +62,6 @@ export default function AirportFlowGridItem({airport, runways, small}: {
                     </Typography>
                 ))}
             </Stack>
-        </Grid2>
+        </Grid>
     );
 }

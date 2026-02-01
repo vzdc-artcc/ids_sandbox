@@ -1,7 +1,7 @@
 'use client';
 import React, {useEffect, useState} from 'react';
-import {Facility, TmuNotice} from "@prisma/client";
-import {Box, Grid2, Typography} from "@mui/material";
+import {Facility, TmuNotice} from "@/generated/prisma/client";
+import {Box, Grid, Typography} from "@mui/material";
 import {fetchSingleTmu} from "@/actions/tmu";
 import {socket} from "@/lib/socket";
 import {toast} from "react-toastify";
@@ -41,14 +41,12 @@ export default function TmuGridItem({facility, big}: { facility: Facility, big?:
     }, [facility]);
 
     return (
-        <Grid2 size={big ? 4 : 3} height={250} sx={{border: 1, overflowY: 'auto', }}>
+        <Grid size={big ? 4 : 3} height={250} sx={{border: 1, overflowY: 'auto', }}>
             <Typography variant="h6">TMU</Typography>
-            <Box sx={{overflow: 'auto',}}>
-                {broadcasts?.map((broadcast) => (
-                    <Typography key={broadcast.id} color="orange" fontSize={13}>{broadcast.message}</Typography>
-                ))}
-            </Box>
-        </Grid2>
+            {broadcasts?.map((broadcast) => (
+                <Typography key={broadcast.id} color="orange" fontSize={13}>{broadcast.message}</Typography>
+            ))}
+        </Grid>
     );
 
 }

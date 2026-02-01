@@ -1,8 +1,8 @@
 'use client';
 import React, {useEffect, useState} from 'react';
-import {Radar} from "@prisma/client";
+import {Radar} from "@/generated/prisma/client";
 import {socket} from "@/lib/socket";
-import {Box, Grid2, Typography} from "@mui/material";
+import {Box, Grid, Typography} from "@mui/material";
 import {getColor} from "@/lib/facilityColor";
 import {getAirportRelatedConsolidations, SectorStatus} from "@/actions/airport-split";
 import {toast} from "react-toastify";
@@ -31,7 +31,11 @@ export default function AirportRadarInformation({icao, radars, disableOnlineInfo
             toast.info('Radar consolidations updated');
         };
 
-        const handleVatsimData = (data: any) => {
+        const handleVatsimData = (data: { controllers: {
+            callsign: string,
+            frequency: string,
+            facility: number,
+            }[] }) => {
             if (!isMounted) return;
             setOnlineAtc((data.controllers as {
                 callsign: string,
@@ -66,30 +70,26 @@ export default function AirportRadarInformation({icao, radars, disableOnlineInfo
 
     return (
         <>
-            <Grid2 size={2} sx={{border: 1,}}>
+            <Grid size={2} sx={{border: 1,height: 250,overflow: 'auto',}}>
                 <Typography variant="h6">RADAR ONLINE</Typography>
-                <Box height={250} sx={{overflow: 'auto',}}>
-                    {onlineAtc?.map((atc) => (
-                        <Typography key={atc.position} color={getColor(atc.facility)}>
-                            <b>{atc.position}</b> {'--->'} {atc.frequency}
-                        </Typography>
-                    ))}
-                    {disableOnlineInformation && <Typography color="gray">DISABLED FOR TRAINING</Typography>}
-                </Box>
-            </Grid2>
-            <Grid2 size={2} sx={{border: 1,}}>
+                {onlineAtc?.map((atc) => (
+                    <Typography key={atc.position} color={getColor(atc.facility)}>
+                        <b>{atc.position}</b> {'--->'} {atc.frequency}
+                    </Typography>
+                ))}
+                {disableOnlineInformation && <Typography color="gray">DISABLED FOR TRAINING</Typography>}
+            </Grid>
+            <Grid size={2} sx={{border: 1,height: 250,overflow: 'auto',}}>
                 <Typography variant="h6">RADAR SPLIT</Typography>
-                <Box height={250} sx={{overflow: 'auto',}}>
-                    {!radarConsolidations && <Typography color="red">ERR: NO PRIM RADAR SET</Typography>}
-                    {radarConsolidations?.map((rs) => (
-                        <Box key={rs.sector.id} sx={{mb: 0.5,}}>
-                            <Typography variant="caption"><span
-                                style={{color: 'gold',}}>{rs.sector.identifier}</span> {'->'} <span
-                                style={{color: rs.open ? 'lightgreen' : rs.consolidatedTo ? 'cyan' : 'red'}}>{rs.open ? 'OPEN' : rs.consolidatedTo ? rs.consolidatedTo.identifier : 'CLOSED'}</span></Typography>
-                        </Box>
-                    ))}
-                </Box>
-            </Grid2>
+                {!radarConsolidations && <Typography color="red">ERR: NO PRIM RADAR SET</Typography>}
+                {radarConsolidations?.map((rs) => (
+                    <Box key={rs.sector.id} sx={{mb: 0.5,}}>
+                        <Typography variant="caption"><span
+                            style={{color: 'gold',}}>{rs.sector.identifier}</span> {'->'} <span
+                            style={{color: rs.open ? 'lightgreen' : rs.consolidatedTo ? 'cyan' : 'red'}}>{rs.open ? 'OPEN' : rs.consolidatedTo ? rs.consolidatedTo.identifier : 'CLOSED'}</span></Typography>
+                    </Box>
+                ))}
+            </Grid>
         </>
 
     );

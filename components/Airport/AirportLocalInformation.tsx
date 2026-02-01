@@ -1,8 +1,8 @@
 'use client';
 import React, {useEffect, useState} from 'react';
-import {Box, Grid2, Tooltip, Typography} from "@mui/material";
+import {Box, Grid, Tooltip, Typography} from "@mui/material";
 import {getColor} from "@/lib/facilityColor";
-import {Airport} from "@prisma/client";
+import {Airport} from "@/generated/prisma/client";
 import {socket} from "@/lib/socket";
 import {useRouter} from "next/navigation";
 import {toast} from "react-toastify";
@@ -20,7 +20,11 @@ export default function AirportLocalInformation({airport, small, disableOnlineIn
     useEffect(() => {
         let isMounted = true;
 
-        const handleVatsimData = (data: any) => {
+        const handleVatsimData = (data: { controllers: {
+            callsign: string,
+            frequency: string,
+            facility: number,
+            }[] }) => {
             if (isMounted) {
                 setOnlineAtc((data.controllers as {
                     callsign: string,
@@ -67,7 +71,7 @@ export default function AirportLocalInformation({airport, small, disableOnlineIn
         }
 
         return (
-            <Grid2 size={2} sx={{border: 1, }}>
+            <Grid size={2} sx={{border: 1,}}>
                 <Tooltip title={<div style={{whiteSpace: 'pre-line'}}>{localSplit.join('\n')}</div>}>
                     {!disableOnlineInformation ? <Typography variant="h6" textAlign="center"
                                                              color={getColor(highestFacility?.facility || 0)}>{highestFacility?.position.substring(highestFacility?.position.length - 3) || 'CLSD'}/{localSplit.length === 0 ? highestFacility?.frequency || 'CTAF' : 'SPLIT'}</Typography> :
@@ -75,33 +79,29 @@ export default function AirportLocalInformation({airport, small, disableOnlineIn
                                     color="gray">{localSplit.length === 0 ? highestFacility?.frequency || '' : 'SPLIT'}</Typography>}
 
                 </Tooltip>
-            </Grid2>
+            </Grid>
         )
     }
 
     return (
         <>
-            <Grid2 size={2} sx={{border: 1,}}>
+            <Grid size={2} sx={{border: 1,height: 250,overflow: 'auto'}}>
                 <Typography variant="h6">LCL ONLINE</Typography>
-                <Box height={250} sx={{overflow: 'auto',}}>
-                    {onlineAtc?.map((atc) => (
-                        <Typography key={atc.position} color={getColor(atc.facility)}>
-                            <b>{atc.position}</b> {'--->'} {atc.frequency}
-                        </Typography>
-                    ))}
-                    {disableOnlineInformation && <Typography color="gray">DISABLED FOR TRAINING</Typography>}
-                </Box>
-            </Grid2>
-            <Grid2 size={2} sx={{border: 1,}}>
+                {onlineAtc?.map((atc) => (
+                    <Typography key={atc.position} color={getColor(atc.facility)}>
+                        <b>{atc.position}</b> {'--->'} {atc.frequency}
+                    </Typography>
+                ))}
+                {disableOnlineInformation && <Typography color="gray">DISABLED FOR TRAINING</Typography>}
+            </Grid>
+            <Grid size={2} sx={{border: 1,height: 250,overflow: 'auto',}}>
                 <Typography variant="h6">LCL SPLIT</Typography>
-                <Box height={250} sx={{overflow: 'auto',}}>
-                    {localSplit.length > 0 &&
-                        <Typography color="hotpink" fontWeight="bold">{airport.facilityId}</Typography>}
-                    {localSplit.map((s, idx) => (
-                        <Typography key={airport.icao + idx + 'LCLSPLIT'}>{s}</Typography>
-                    ))}
-                </Box>
-            </Grid2>
+                {localSplit.length > 0 &&
+                    <Typography color="hotpink" fontWeight="bold">{airport.facilityId}</Typography>}
+                {localSplit.map((s, idx) => (
+                    <Typography key={airport.icao + idx + 'LCLSPLIT'}>{s}</Typography>
+                ))}
+            </Grid>
         </>
 
     );

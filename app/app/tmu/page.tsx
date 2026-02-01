@@ -1,6 +1,11 @@
 import React from 'react';
 import {Box, Stack, Typography} from "@mui/material";
 import ReleaseRequestViewer from "@/components/ReleaseRequest/ReleaseRequestViewer";
+import {Metadata} from "next";
+
+export const metadata: Metadata = {
+    title: 'TMU',
+};
 
 export default async function Page() {
 

@@ -7,6 +7,7 @@ import Navbar from "@/components/Navbar/Navbar";
 import {ToastContainer} from "react-toastify";
 import {Container, Typography} from "@mui/material";
 import Script from "next/script";
+import {Metadata} from "next";
 
 const roboto = Roboto({
   weight: ['300', '400', '500', '700'],
@@ -14,6 +15,11 @@ const roboto = Roboto({
   display: 'swap',
   variable: '--font-roboto',
 });
+
+export const metadata: Metadata = {
+    title: 'IDS',
+    description: 'vZDC IDS',
+};
 
 export default function RootLayout({
   children,

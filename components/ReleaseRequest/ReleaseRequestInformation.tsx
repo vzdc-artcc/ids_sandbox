@@ -156,7 +156,7 @@ export default function ReleaseRequestInformation({ facility, cid }: { facility:
 
     return (
         <>
-            <Grid size={5} sx={{border: 1, overflowY: 'auto',}}>
+            <Grid size={5} sx={{border: 1, height: 250, overflowY: 'auto',}}>
                 <Typography variant="h6">RELEASE</Typography>
                 {releaseRequests?.sort((a, b) => {
                     const statusOrder = {
