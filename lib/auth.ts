@@ -3,7 +3,7 @@ import {prismaAdapter} from "better-auth/adapters/prisma";
 import prisma from "@/lib/prisma";
 import {genericOAuth} from "better-auth/plugins";
 
-const {VATSIM_CLIENT_ID, VATSIM_CLIENT_SECRET, DEV_MODE} = process.env;
+const {VATSIM_CLIENT_ID, VATSIM_CLIENT_SECRET, DEV_MODE, VATUSA_FACILITY} = process.env;
 const VATSIM_BASE_URL = DEV_MODE === 'true' ? 'https://auth-dev.vatsim.net' : 'https://auth.vatsim.net';
 
 export const auth = betterAuth({
@@ -60,6 +60,14 @@ export const auth = betterAuth({
                             },
                         });
                         const { data } = await response.json();
+
+                        if (!DEV_MODE) {
+                            const res = await fetch(`https://api.vatusa.net/v2/user/${data.cid}`);
+                            const userData = await res.json();
+                            if (userData.data.facility !== VATUSA_FACILITY && !userData.data.visiting_facilities.map((f: {facility: string}) => f.facility).includes(VATUSA_FACILITY)) {
+                                throw new Error('User is not a member of the ARTCC.');
+                            }
+                        }
 
                         return {
                             id: data.cid.toString(),
