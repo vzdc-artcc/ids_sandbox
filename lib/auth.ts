@@ -54,7 +54,7 @@ export const auth = betterAuth({
                     tokenUrl: `${VATSIM_BASE_URL}/oauth/token`,
                     scopes: ["email", "vatsim_details", "full_name",],
                     getUserInfo: async (tokens) => {
-                        const response = await fetch("https://auth-dev.vatsim.net/api/user", {
+                        const response = await fetch(`${VATSIM_BASE_URL}/api/user`, {
                             headers: {
                                 Authorization: `Bearer ${tokens.accessToken}`,
                             },
