@@ -52,7 +52,7 @@ export const auth = betterAuth({
                     clientSecret: VATSIM_CLIENT_SECRET || "",
                     authorizationUrl: `${VATSIM_BASE_URL}/oauth/authorize`,
                     tokenUrl: `${VATSIM_BASE_URL}/oauth/token`,
-                    scopes: ["email", "vatsim_details", "full_name",],
+                    scopes: ["email", "vatsim_details", "full_name", ],
                     getUserInfo: async (tokens) => {
                         const response = await fetch(`${VATSIM_BASE_URL}/api/user`, {
                             headers: {
@@ -60,6 +60,7 @@ export const auth = betterAuth({
                             },
                         });
                         const { data } = await response.json();
+                        console.log(data);
 
                         return {
                             id: data.cid.toString(),
@@ -72,7 +73,7 @@ export const auth = betterAuth({
                             lastName: data.personal.name_last,
                             email: data.personal.email,
                             division: data.vatsim.division.id,
-                            artcc: data.vatsim.subdivision.id,
+                            artcc: data.vatsim.subdivision.id || 'UNKNOWN',
                         };
                     },
                 },
