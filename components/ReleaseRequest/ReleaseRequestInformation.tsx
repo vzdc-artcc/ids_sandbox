@@ -9,7 +9,7 @@ import {
     DialogContent,
     DialogTitle,
     FormControl,
-    Grid2,
+    Grid,
     IconButton,
     InputLabel, MenuItem, Select,
     Tooltip,
@@ -64,6 +64,11 @@ export default function ReleaseRequestInformation({ facility, cid }: { facility:
         );
     }, []);
 
+    const playNewReleaseTime = async () => {
+        const audio = new Audio(`/sound/release_time_update.mp3`);
+        await audio.play();
+    }
+
     useEffect(() => {
         let isMounted = true;
 
@@ -74,7 +79,7 @@ export default function ReleaseRequestInformation({ facility, cid }: { facility:
             });
         };
 
-        const handleRefreshReleaseWithNotification = (rr: any) => {
+        const handleRefreshReleaseWithNotification = (rr: ReleaseRequestWithStatus) => {
             if (!isMounted) return;
             if (rr.startedBy.cid !== cid && rr.initFacility !== facility) return;
 
@@ -90,7 +95,7 @@ export default function ReleaseRequestInformation({ facility, cid }: { facility:
             playNewReleaseTime().then();
         };
 
-        const handleRefreshReleaseStatusOnly = (rr: any) => {
+        const handleRefreshReleaseStatusOnly = (rr: ReleaseRequestWithStatus) => {
             if (!isMounted) return;
             if (rr.startedBy.cid !== cid && rr.initFacility !== facility) return;
 
@@ -142,10 +147,6 @@ export default function ReleaseRequestInformation({ facility, cid }: { facility:
         return () => clearInterval(intervalId);
     }, []);
 
-    const playNewReleaseTime = async () => {
-        const audio = new Audio(`/sound/release_time_update.mp3`);
-        await audio.play();
-    }
 
     const clickDeleteReleaseRequest = async (id: string) => {
         const rr = await deleteReleaseRequest(id);
@@ -155,7 +156,7 @@ export default function ReleaseRequestInformation({ facility, cid }: { facility:
 
     return (
         <>
-            <Grid2 size={5} sx={{border: 1, overflowY: 'auto',}}>
+            <Grid size={5} sx={{border: 1, overflowY: 'auto',}}>
                 <Typography variant="h6">RELEASE</Typography>
                 {releaseRequests?.sort((a, b) => {
                     const statusOrder = {
@@ -192,7 +193,7 @@ export default function ReleaseRequestInformation({ facility, cid }: { facility:
                             <span onClick={() => setUpdateReleaseRequest(releaseRequest)}><b>{releaseRequest.callsign}</b> | <i>{releaseRequest.initState}&nbsp;</i> | {getReleaseTimeText(releaseRequest)}</span>
                         </Typography>
                     ))}
-            </Grid2>
+            </Grid>
             <Dialog open={!!updateReleaseRequest} onClose={() => setUpdateReleaseRequest(undefined)} maxWidth="sm" fullWidth>
                 {updateReleaseRequest &&
                     <>
