@@ -1,7 +1,7 @@
 'use client';
 import React, {useEffect, useState} from 'react';
 import {fetchAllAirspaceDiagrams} from "@/actions/airspace";
-import {Airport} from "@prisma/client";
+import {Airport} from "@/generated/prisma/client";
 import {Autocomplete, Box, CircularProgress, Stack, TextField} from "@mui/material";
 import Image from "next/image";
 
