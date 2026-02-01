@@ -2,9 +2,6 @@
 
 FROM node:22.12.0-alpine AS base
 
-# Ensure corepack/pnpm is enabled in the base image to prefer pnpm across stages
-RUN corepack enable pnpm
-
 # Install dependencies only when needed
 FROM base AS deps
 # Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
@@ -64,6 +61,8 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
 COPY --from=builder --chown=nextjs:nodejs /app/prisma.config.ts ./prisma.config.ts
+
+RUN npm i prisma dotenv
 
 USER nextjs
 
