@@ -25,17 +25,8 @@ export async function generateMetadata(props: { params: Promise<{ id: string }> 
     const params = await props.params;
     const {id} = params;
 
-    const airport = await prisma.radar.findUnique({
-        where: {
-            facilityId: id,
-        },
-        select: {
-            facilityId: true,
-        },
-    });
-
     return {
-        title: airport?.facilityId || 'UNKNOWN',
+        title: `${id} -- IDS`,
     }
 }
 
