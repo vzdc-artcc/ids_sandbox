@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import {Box, Button, ButtonGroup, Grid, Typography} from "@mui/material";
+import {Button, ButtonGroup, Grid, Typography} from "@mui/material";
 import Link from "next/link";
 import {usePathname} from "next/navigation";
 import {Airport, Radar} from "@/generated/prisma/client";
@@ -23,7 +23,7 @@ export default function ButtonsTray({airport, radar,}: { airport?: Airport, rada
                     <Button color="inherit" sx={{ backgroundColor: 'lightcyan', color: 'black' }}>REL</Button>
                 </Link>
                 <Link
-                    href={redirectToViewer('url', new URLSearchParams({url: '/app/conflict-probing'}))}>
+                    href={redirectToViewer('conflict-probing')}>
                     <Button color="inherit" sx={{ backgroundColor: 'darkviolet', color: 'white' }}>CONF-P</Button>
                 </Link>
                 <Link href={redirectToViewer('prd', new URLSearchParams({startAirport: airport?.iata || '',}))}>

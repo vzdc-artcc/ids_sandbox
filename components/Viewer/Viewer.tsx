@@ -13,6 +13,7 @@ import AirportSettings from "@/components/Viewer/AirportSettings";
 import RadarSettings from "@/components/Viewer/RadarSettings";
 import Consolidation from "@/components/Viewer/Consolidation";
 import ReleaseWindow from "@/components/Viewer/ReleaseWindow";
+import ConflictProbing from "@/components/Viewer/ConflictProbing";
 
 export default function Viewer() {
 
@@ -32,6 +33,7 @@ export default function Viewer() {
             {display === 'url' && <UrlViewer url={searchParams.get('url') || ''}/>}
             {display === 'emergency' && <EmergencyChecklist/>}
             {display === 'position' && <PositionChecklist/>}
+            {display === 'conflict-probing' && <ConflictProbing />}
             {display === 'wx' && <Weather/>}
             {display === 'sop' && <SopViewer defaultFacility={facility || undefined}/>}
             {display === 'prd' && <PreferredRoutes startAirport={prdStartAirport || undefined}/>}
