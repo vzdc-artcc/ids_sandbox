@@ -15,7 +15,7 @@ export default function AirportAtisGridItems({icao, small, free, atisIntegration
     disableOnlineInformation?: boolean,
 }) {
 
-    const [airportIcao, setairportIcao] = useState<string>(icao);
+    const [airportIcao, setAirportIcao] = useState<string>(icao);
     const [combinedAtis, setCombinedAtis] = useState<AtisUpdate>();
     const [departureAtis, setDepartureAtis] = useState<AtisUpdate>();
     const [arrivalAtis, setArrivalAtis] = useState<AtisUpdate>();
@@ -131,7 +131,7 @@ export default function AirportAtisGridItems({icao, small, free, atisIntegration
 
     const handleAirportIcaoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const newIcao = e.target.value.toUpperCase();
-        setairportIcao(newIcao);
+        setAirportIcao(newIcao);
         fetchMetar(newIcao).then(setMetar).catch((error) => {
             console.error('Error fetching METAR:', error);
         });
