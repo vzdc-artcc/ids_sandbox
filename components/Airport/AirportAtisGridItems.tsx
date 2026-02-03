@@ -57,6 +57,7 @@ export default function AirportAtisGridItems({icao, small, free, atisIntegration
                 }[])
                     .filter((atis) => airportIcao.length === 4 ? atis.callsign.startsWith(airportIcao) : false);
 
+                console.log(atis);
                 if (atis.length === 0) {
                     setCombinedAtis(undefined);
                     setDepartureAtis(undefined);
@@ -66,21 +67,23 @@ export default function AirportAtisGridItems({icao, small, free, atisIntegration
 
                 atis.forEach((atis) => {
                     const atisLetter = atis.atis_code || ((atis.text_atis as string[]) || [''])[0]?.match(/ATIS INFO ([A-Z])/i)?.[1] || '-';
-
+                    console.log('attempting to set ATIS letter to', atisLetter);
                     const atisUpdate = {
                         atisLetter,
                         airportConditions: atis.text_atis?.join(' ') || 'N/A',
                         notams: 'N/A',
                     } as AtisUpdate;
 
-                    // more than 5 minutes old
-                    const tenMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+                    const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000);
                     if (atis.callsign.includes('_D_')) {
-                        setDepartureAtis((prev) => !prev || new Date(prev.timestamp) < tenMinutesAgo ? atisUpdate : prev);
+                        console.log('Setting departure ATIS');
+                        setDepartureAtis((prev) => !prev || !prev.timestamp || new Date(prev.timestamp) < tenMinutesAgo ? atisUpdate : prev);
                     } else if (atis.callsign.includes('_A_')) {
-                        setArrivalAtis((prev) => !prev || new Date(prev.timestamp) < tenMinutesAgo ? atisUpdate : prev);
+                        console.log('Setting arrival ATIS');
+                        setArrivalAtis((prev) => !prev || !prev.timestamp || new Date(prev.timestamp) < tenMinutesAgo ? atisUpdate : prev);
                     } else {
-                        setCombinedAtis((prev) => !prev || new Date(prev.timestamp) < tenMinutesAgo ? atisUpdate : prev);
+                        console.log('Setting combined ATIS');
+                        setCombinedAtis((prev) => !prev || !prev.timestamp || new Date(prev.timestamp) < tenMinutesAgo ? atisUpdate : prev);
                     }
                 });
             }

@@ -18,7 +18,7 @@ export default function AlertsWindow({alerts}: { alerts: AlertAircraft[] }) {
     return (
         <Card sx={{height: '100%'}}>
             <CardContent>
-                <Typography gutterBottom>Active Alerts</Typography>
+                <Typography gutterBottom>Conflict Probing</Typography>
                 {redAlerts.map((a, i) => (
                     <Typography key={`red-alert-${i}`} variant="h6" sx={{color: 'red'}}>
                         <b>

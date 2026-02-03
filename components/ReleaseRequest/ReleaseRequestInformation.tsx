@@ -20,6 +20,7 @@ import {toast} from "react-toastify";
 import {RemoveCircleOutline} from "@mui/icons-material";
 import {shouldKeepReleaseRequest} from "@/lib/releaseRequest";
 import Form from "next/form";
+import {ReleaseRequestAircraftState} from "@/types";
 
 type ReleaseRequestWithStatus = ReleaseRequestWithAll & {
     status: 'PENDING' | 'SOON' | 'ACTIVE' | 'EXPIRED';
@@ -158,10 +159,10 @@ export default function ReleaseRequestInformation({ facility, cid }: { facility:
         <>
             <Grid size={5} sx={{border: 1, height: 250, overflowY: 'auto',}}>
                 <Typography variant="h6">RELEASE</Typography>
-                {releaseRequests?.sort((a, b) => {
+                {releaseRequests?.sort((a, b) => a.initTime.getTime() - b.initTime.getTime()).sort((a, b) => {
                     const statusOrder = {
-                        'ACTIVE': 1,
-                        'EXPIRED': 2,
+                        'ACTIVE': 2,
+                        'EXPIRED': 1,
                         'PENDING': 4,
                         'SOON': 3,
                     };
@@ -174,8 +175,11 @@ export default function ReleaseRequestInformation({ facility, cid }: { facility:
                         if (a.status === 'EXPIRED' && a.upperDate && b.upperDate) {
                             return a.upperDate.getTime() - b.upperDate.getTime();
                         }
-                        if ((a.status === 'PENDING' || a.status === 'SOON') && a.releaseTime && b.releaseTime) {
-                            return a.releaseTime.getTime() - b.releaseTime.getTime();
+                        if (a.status === 'PENDING' || a.status === 'SOON') {
+                            const states = Object.values(ReleaseRequestAircraftState).filter((item) => {
+                                return isNaN(Number(item));
+                            });
+                            return states.indexOf(b.initState) - states.indexOf(a.initState);
                         }
                         return 0;
                     }
@@ -214,11 +218,11 @@ export default function ReleaseRequestInformation({ facility, cid }: { facility:
                                         defaultValue={updateReleaseRequest.initState}
                                         required
                                     >
-                                        <MenuItem value="RMP">RAMP</MenuItem>
-                                        <MenuItem value="PSH">PUSH</MenuItem>
-                                        <MenuItem value="TXI">TAXI</MenuItem>
-                                        <MenuItem value="RDY">READY</MenuItem>
-                                        <MenuItem value="HLD">HOLD</MenuItem>
+                                        {Object.values(ReleaseRequestAircraftState).filter((item) => {
+                                            return isNaN(Number(item));
+                                        }).map((state) => (
+                                            <MenuItem key={state} value={state}>{state}</MenuItem>
+                                        ))}
                                     </Select>
                                 </FormControl>
                                 <DialogActions>

@@ -16,6 +16,7 @@ import {shouldKeepReleaseRequest} from "@/lib/releaseRequest";
 import MessageForm from "@/components/ReleaseRequest/MessageForm";
 import ReleaseWindow from "@/components/Viewer/ReleaseWindow";
 import {toast} from "react-toastify";
+import {ReleaseRequestAircraftState} from "@/types";
 
 export type ReleaseRequestWithAll = ReleaseRequest & {
     startedBy: User,
@@ -164,7 +165,7 @@ export default function ReleaseRequestViewer() {
         if (!acc[curr.destination]) {
             acc[curr. destination] = [];
         }
-        acc[curr.destination]. push(curr);
+        acc[curr.destination].push(curr);
         return acc;
     }, {} as { [key: string]:  ReleaseRequestWithAll[] });
 
@@ -185,18 +186,19 @@ export default function ReleaseRequestViewer() {
                     { requestGroupedByDestination && <Typography color="gold" sx={{ border: 1, p: 0.5, px: 1, display: 'inline-block', }}>{requestGroupedByDestination[dest].length} TOTAL / {(requestGroupedByDestination[dest]).filter((rr) => rr.released).length} REL</Typography> }
                     { requestGroupedByDestination && requestGroupedByDestination[dest].length > requestGroupedByDestination[dest].filter((rr) => rr.released).length && <Typography color="red" sx={{ border: 1, p: 0.5, px: 1, display: 'inline-block', }}>PENDING</Typography> }
                     <Box sx={{ border: 1, borderColor: 'gold', px: 1, height: 300, overflow: 'auto', }}>
-                        {requestGroupedByDestination && requestGroupedByDestination[dest].sort((a, b) => {
-                            // sort by if there is a release time, then put them first ASC.  If not then sort by init time ASC
-                            if (a.releaseTime && b.releaseTime) {
-                                return a.releaseTime.getTime() - b.releaseTime.getTime();
-                            }
-                            if (a.releaseTime && !b.releaseTime) {
+                        {requestGroupedByDestination && requestGroupedByDestination[dest].sort((a,b) => a.initTime.getTime() - b.initTime.getTime()).sort((a, b) => {
+                            if (a.released && b.released) {
+                                return (a.releaseTime || new Date()).getTime() - (b.releaseTime || new Date()).getTime();
+                            } else if (a.released && !b.released) {
                                 return -1;
-                            }
-                            if (!a.releaseTime && b.releaseTime) {
+                            } else if (!a.released && b.released) {
                                 return 1;
+                            } else {
+                                const states = Object.values(ReleaseRequestAircraftState).filter((item) => {
+                                    return isNaN(Number(item));
+                                });
+                                return states.indexOf(b.initState) - states.indexOf(a.initState);
                             }
-                            return a.initTime.getTime() - b.initTime.getTime();
                         }).map((releaseRequest) => (
                             <Box key={releaseRequest.id}>
                                 <Divider />

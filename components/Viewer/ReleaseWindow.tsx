@@ -5,10 +5,11 @@ import {Box, Button, FormControl, Grid, InputLabel, MenuItem, Select, TextField,
 import {createReleaseRequest} from "@/actions/release";
 import {toast} from "react-toastify";
 import {socket} from "@/lib/socket";
+import {ReleaseRequestAircraftState} from "@/types";
 
 export default function ReleaseWindow({ facilityId, onSubmit }: { facilityId: string, onSubmit?: () => void }) {
 
-    const [initState, setInitState] = useState('PSH');
+    const [initState, setInitState] = useState("PUSH");
     const [aircraftType, setAircraftType] = useState('J');
 
     const handleSubmit = async (formData: FormData) => {
@@ -22,7 +23,7 @@ export default function ReleaseWindow({ facilityId, onSubmit }: { facilityId: st
         socket.emit('new-release-request', request.id);
         toast.success(`${request.callsign} FROM ${request.origin} -> ${request.destination}`);
         onSubmit?.();
-        setInitState('PSH');
+        setInitState("PUSH");
         setAircraftType('J');
     }
 
@@ -75,11 +76,11 @@ export default function ReleaseWindow({ facilityId, onSubmit }: { facilityId: st
                                 onChange={e => setInitState(e.target.value)}
                                 required
                             >
-                                <MenuItem value="RMP">RAMP</MenuItem>
-                                <MenuItem value="PSH">PUSH</MenuItem>
-                                <MenuItem value="TXI">TAXI</MenuItem>
-                                <MenuItem value="RDY">READY</MenuItem>
-                                <MenuItem value="HLD">HOLD</MenuItem>
+                                {Object.values(ReleaseRequestAircraftState).filter((item) => {
+                                    return isNaN(Number(item));
+                                }).map((state) => (
+                                    <MenuItem key={state} value={state}>{state}</MenuItem>
+                                ))}
                             </Select>
                         </FormControl>
                     </Grid>
@@ -104,7 +105,7 @@ export default function ReleaseWindow({ facilityId, onSubmit }: { facilityId: st
                     <Grid size={2}>
                         <TextField
                             variant="filled"
-                            label="Free Text (optional)"
+                            label="Free Text or NON-STANDARD departure runway (optional)"
                             helperText="Use only if there will be an impact to release time."
                             name="freeText"
                             fullWidth

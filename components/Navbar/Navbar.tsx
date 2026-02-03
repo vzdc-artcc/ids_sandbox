@@ -11,7 +11,8 @@ import Link from "next/link";
 import type {Consolidation} from "@/types";
 import NavConsolidationDeleteButton from "@/components/Navbar/NavConsolidationDeleteButton";
 
-const {DEV_MODE, TRAINING_MODE, IS_STAFF_ENDPOINT} = process.env;
+const {DEV_MODE, IS_STAFF_ENDPOINT} = process.env;
+const TRAINING_MODE = process.env['TRAINING_MODE'] === 'true';
 
 export default async function Navbar({activeConsol}: {activeConsol?: Consolidation}) {
 
