@@ -38,8 +38,6 @@ export const fetchReleaseRequestsFiltered = async (cid: string, facility: string
         });
     }
 
-    console.log(toReturn);
-
     return toReturn.filter((rr) => {
         return rr.destination === cid || rr.initFacility === facility;
     });
