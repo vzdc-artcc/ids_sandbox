@@ -5,28 +5,43 @@ import {revalidatePath} from "next/cache";
 import prisma from "@/lib/prisma";
 import {auth} from "@/lib/auth";
 import {headers} from "next/headers";
+import {ReleaseRequest} from "@/generated/prisma/client";
+import {ReleaseRequestAircraftState} from "@/types";
+
+const getQueuePosition = (releaseRequests: ReleaseRequest[], releaseRequest: ReleaseRequest) => {
+    const sortedReleaseRequests = releaseRequests.sort((a, b) => a.initTime.getTime() - b.initTime.getTime())
+        .sort((a, b) => {
+            const states = Object.values(ReleaseRequestAircraftState).filter((item) => {
+                return isNaN(Number(item));
+            });
+            return states.indexOf(b.initState) - states.indexOf(a.initState);
+        });
+
+    return sortedReleaseRequests.findIndex(r => r.id === releaseRequest.id);
+}
 
 export const fetchReleaseRequestsFiltered = async (cid: string, facility: string) => {
-    return prisma.releaseRequest.findMany({
-        where: {
-            OR: [
-                {
-                    startedBy: {
-                        cid,
-                    },
-                },
-                {
-                    initFacility: facility,
-                },
-            ],
-        },
-        orderBy: [
-            { releaseTime: 'asc', },
-            { initTime: 'asc',}
-        ],
+    const allReleaseRequests = await prisma.releaseRequest.findMany({
         include: {
             startedBy: true,
-        }
+        },
+    });
+
+    const toReturn = []
+    for (const rr of allReleaseRequests) {
+        toReturn.push({
+            ...rr,
+            queuePosition: getQueuePosition(
+                allReleaseRequests.filter(r => !r.released && r.destination === rr.destination),
+                rr,
+            ),
+        });
+    }
+
+    console.log(toReturn);
+
+    return toReturn.filter((rr) => {
+        return rr.destination === cid || rr.initFacility === facility;
     });
 }
 
@@ -177,13 +192,14 @@ export const deleteReleaseRequests = async (onlyPast: boolean) => {
     revalidatePath('/', 'layout');
 }
 
-export const notifyNewReleaseStatus = async (id: string, status: string) => {
+export const notifyNewReleaseStatus = async (id: string, status: string, freeText: string) => {
     return prisma.releaseRequest.update({
         where: {
             id,
         },
         data: {
             initState: status,
+            freeText: freeText,
         },
         include: {
             startedBy: true,

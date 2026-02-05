@@ -49,8 +49,7 @@ export default function AirportCharts({icao}: { icao: string, }) {
     };
 
     return (
-        <Box>
-            <Typography variant="h6">CHARTS</Typography>
+        <Box sx={{ mt: 1, }}>
             {!charts && <CircularProgress/>}
             {Object.entries(charts || {}).map(([code, charts]) => (
                 <ButtonGroup

@@ -1,6 +1,6 @@
 'use client'
 import React, {useCallback, useEffect, useState} from 'react';
-import {ReleaseRequestWithAll} from "@/components/ReleaseRequest/ReleaseRequestViewer";
+import {ReleaseRequestWithAll as ReleaseRequestWithAllBasic} from "@/components/ReleaseRequest/ReleaseRequestViewer";
 import {socket} from "@/lib/socket";
 import {deleteReleaseRequest, fetchReleaseRequestsFiltered, notifyNewReleaseStatus} from "@/actions/release";
 import {
@@ -11,7 +11,7 @@ import {
     FormControl,
     Grid,
     IconButton,
-    InputLabel, MenuItem, Select,
+    InputLabel, MenuItem, Select, TextField,
     Tooltip,
     Typography
 } from "@mui/material";
@@ -21,6 +21,10 @@ import {RemoveCircleOutline} from "@mui/icons-material";
 import {shouldKeepReleaseRequest} from "@/lib/releaseRequest";
 import Form from "next/form";
 import {ReleaseRequestAircraftState} from "@/types";
+
+type ReleaseRequestWithAll = ReleaseRequestWithAllBasic & {
+    queuePosition: number;
+}
 
 type ReleaseRequestWithStatus = ReleaseRequestWithAll & {
     status: 'PENDING' | 'SOON' | 'ACTIVE' | 'EXPIRED';
@@ -171,7 +175,13 @@ export default function ReleaseRequestInformation({ facility, cid }: { facility:
                             if (!a.upperDate) return 1;
                             if (!b.upperDate) return -1;
                             return a.lowerDate.getTime() - b.lowerDate.getTime();
+                        } else if (a.status === 'ACTIVE') {
+                            if (!a.lowerDate && !b.lowerDate) return 0;
+                            if (!a.lowerDate) return 1;
+                            if (!b.lowerDate) return -1;
+                            return a.lowerDate.getTime() - b.lowerDate.getTime();
                         }
+
                         if (a.status === 'EXPIRED' && a.upperDate && b.upperDate) {
                             return a.upperDate.getTime() - b.upperDate.getTime();
                         }
@@ -194,7 +204,7 @@ export default function ReleaseRequestInformation({ facility, cid }: { facility:
                                     <RemoveCircleOutline fontSize="small" />
                                 </IconButton>
                             </Tooltip>
-                            <span onClick={() => setUpdateReleaseRequest(releaseRequest)}><b>{releaseRequest.callsign}</b> | <i>{releaseRequest.initState}&nbsp;</i> | {getReleaseTimeText(releaseRequest)}</span>
+                            <span onClick={() => setUpdateReleaseRequest(releaseRequest)}><b>{releaseRequest.callsign}</b> | <i>{releaseRequest.initState}&nbsp;</i> {!releaseRequest.released && releaseRequest.queuePosition >= 0 && `(${releaseRequest.destination}-${releaseRequest.queuePosition + 1})`} | {getReleaseTimeText(releaseRequest)}</span>
                         </Typography>
                     ))}
             </Grid>
@@ -203,7 +213,7 @@ export default function ReleaseRequestInformation({ facility, cid }: { facility:
                     <>
                         <DialogTitle>NEW STATUS - {updateReleaseRequest.callsign}</DialogTitle>
                         <Form action={(data: FormData) => {
-                            notifyNewReleaseStatus(updateReleaseRequest.id || '', data.get('status') as string).then((r) => {
+                            notifyNewReleaseStatus(updateReleaseRequest.id || '', data.get('status') as string, data.get('freeText') as string).then((r) => {
                                 socket.emit('refresh-release-status', r);
                                 setUpdateReleaseRequest(undefined);
                                 toast.success("New status notified.");
@@ -225,6 +235,15 @@ export default function ReleaseRequestInformation({ facility, cid }: { facility:
                                         ))}
                                     </Select>
                                 </FormControl>
+                                <TextField
+                                    variant="filled"
+                                    label="Free Text or NON-STANDARD departure runway (optional)"
+                                    helperText="Use only if there will be an impact to release time."
+                                    name="freeText"
+                                    defaultValue={updateReleaseRequest.freeText || ''}
+                                    fullWidth
+                                    sx={{ mt: 2, }}
+                                    />
                                 <DialogActions>
                                     <Button color="inherit" size="small" onClick={() => setUpdateReleaseRequest(undefined)}>Cancel</Button>
                                     <Button variant="contained" size="small" type="submit">Update</Button>
